@@ -124,4 +124,13 @@ app.get('/api/result/:id', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
+
+app.get('/api/positives', (req, res) => {
+  res.json(POSITIVOS);
+});
+
+app.get('/api/negatives', (req, res) => {
+  res.json(NEGATIVOS);
+});
+
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
