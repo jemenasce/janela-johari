@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Janela de Autoconhecimento</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background: #fafafa;
+        padding: 2rem;
+        color: #333;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+      }
+      h1 {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+      }
+      h2 {
+        margin-top: 2rem;
+        font-size: 1.4rem;
+      }
+      input[type="text"] {
+        width: 100%;
+        padding: 0.75rem;
+        margin: 0.5rem 0 1rem 0;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+      }
+      .tag {
+        border: 1px solid #ccc;
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+        transition: 0.2s;
+      }
+      .tag.selected {
+        background-color: #000;
+        color: white;
+        border-color: #000;
+      }
+      button {
+        margin-top: 2rem;
+        padding: 0.75rem 1.5rem;
+        background: black;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      button:hover {
+        background: #333;
+      }
+      .hidden {
+        display: none;
+      }
+      #link-result {
+        margin-top: 2rem;
+        background: #f0f0f0;
+        padding: 1rem;
+        border-radius: 8px;
+        word-break: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>✨ Janela de Autoconhecimento</h1>
+      <p>Escolha <strong>3 adjetivos positivos</strong> e <strong>3 negativos</strong> que descrevem você. Depois, gere seu resultado!</p>
+
+      <form id="johari-form">
+        <label>Seu nome:</label>
+        <input type="text" id="name" placeholder="Ex: Jéssica" required />
+
+        <h2>Adjetivos Positivos</h2>
+        <div class="grid" id="positives"></div>
+
+        <h2>Adjetivos Negativos</h2>
+        <div class="grid" id="negatives"></div>
+
+        <button type="submit">✨ Gerar meu resultado</button>
+      </form>
+
+      <div id="link-result" class="hidden"></div>
+    </div>
+
+    <script>
+      const POSITIVOS = [
+        "Amigável", "Confiável", "Comunicativa", "Criativa", "Cuidadosa",
+        "Determinado(a)", "Disciplinado(a)", "Empático(a)", "Engraçado(a)", "Entusiasmado(a)",
+        "Flexível", "Generoso(a)", "Honesto(a)", "Imaginativo(a)", "Independente",
+        "Influente", "Inspirador(a)", "Inteligente", "Intuitivo(a)", "Lógico(a)",
+        "Motivado(a)", "Observador(a)", "Objetivo(a)", "Organizado(a)", "Paciente",
+        "Persistente", "Prático(a)", "Proativo(a)", "Racional", "Resiliente",
+        "Responsável", "Seguro(a)", "Sensível", "Sociável", "Solidário(a)",
+        "Talentoso(a)", "Tranquilo(a)", "Versátil", "Visionário(a)", "Vivaz"
+      ];
+
+      const NEGATIVOS = [
+        "Ansioso(a)", "Arrogante", "Autoritário(a)", "Cético(a)", "Desconfiado(a)",
+        "Desorganizado(a)", "Distraído(a)", "Egocêntrico(a)", "Emotivo(a)", "Explosivo(a)",
+        "Impaciente", "Impulsivo(a)", "Indeciso(a)", "Inseguro(a)", "Introvertido(a)",
+        "Irritável", "Irresponsável", "Mentiroso(a)", "Imaturo(a)", "Mau humorado",
+        "Nervoso(a)", "Orgulhoso(a)", "Passivo(a)", "Perfeccionista", "Postergador(a)",
+        "Rígido(a)", "Sarcástico(a)", "Sensível demais", "Teimoso(a)", "Tímido(a)"
+      ];
+
+      const container = (id, list) => {
+        const el = document.getElementById(id);
+        list.forEach(word => {
+          const tag = document.createElement("div");
+          tag.className = "tag";
+          tag.textContent = word;
+          tag.addEventListener("click", () => {
+            tag.classList.toggle("selected");
+            const selected = el.querySelectorAll(".tag.selected");
+            if (selected.length > 3) {
+              selected[0].classList.remove("selected");
+            }
+          });
+          el.appendChild(tag);
+        });
+      };
+
+      container("positives", POSITIVOS);
+      container("negatives", NEGATIVOS);
+
+      document.getElementById("johari-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = document.getElementById("name").value.trim();
+        const positives = [...document.querySelectorAll("#positives .tag.selected")].map(e => e.textContent);
+        const negatives = [...document.querySelectorAll("#negatives .tag.selected")].map(e => e.textContent);
+
+        if (positives.length !== 3 || negatives.length !== 3) {
+          alert("Selecione exatamente 3 positivos e 3 negativos!");
+          return;
+        }
+
+        const res = await fetch("/api/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, positives, negatives })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          const link = `${window.location.origin}/resultado.html?id=${data.id}`;
+          const resultDiv = document.getElementById("link-result");
+          resultDiv.innerHTML = `<strong>Seu link:</strong><br><a href="${link}" target="_blank">${link}</a>`;
+          resultDiv.classList.remove("hidden");
+        } else {
+          alert("Erro ao salvar resultado.");
+        }
+      });
+    </script>
+  </body>
+</html>

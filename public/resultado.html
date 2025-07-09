@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Janela de Johari - Resultado</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#fafafa; padding:2rem; color:#333; }
+    .container { max-width: 900px; margin: auto; background:#fff; padding:2rem; border-radius:12px; box-shadow: 0 0 20px rgba(0,0,0,0.05);}
+    h1 { font-size:1.8rem; margin-bottom:1rem;}
+    .grid-quadrantes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 1rem;
+    }
+    .quadrante {
+      border: 2px solid #000;
+      border-radius: 12px;
+      padding: 1rem;
+      background: #f0f0f0;
+    }
+    .quadrante h2 {
+      margin-top: 0;
+      font-size: 1.4rem;
+      border-bottom: 2px solid #000;
+      padding-bottom: 0.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .tag {
+      display: inline-block;
+      background: #000;
+      color: #fff;
+      border-radius: 15px;
+      padding: 5px 12px;
+      margin: 3px 4px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Janela de Johari - Resultado</h1>
+    <p>Nome: <strong id="name">Carregando...</strong></p>
+    <div class="grid-quadrantes">
+      <div class="quadrante" id="aberto">
+        <h2>Aberto (conhecido por mim e pelos outros)</h2>
+        <div><strong>Positivos:</strong> <span id="aberto-pos"></span></div>
+        <div><strong>Negativos:</strong> <span id="aberto-neg"></span></div>
+      </div>
+      <div class="quadrante" id="cego">
+        <h2>Cego (conhecido pelos outros, desconhecido por mim)</h2>
+        <div><strong>Positivos:</strong> <span id="cego-pos"></span></div>
+        <div><strong>Negativos:</strong> <span id="cego-neg"></span></div>
+      </div>
+      <div class="quadrante" id="oculto">
+        <h2>Oculto (conhecido por mim, desconhecido pelos outros)</h2>
+        <div><strong>Positivos:</strong> <span id="oculto-pos"></span></div>
+        <div><strong>Negativos:</strong> <span id="oculto-neg"></span></div>
+      </div>
+      <div class="quadrante" id="desconhecido">
+        <h2>Desconhecido (desconhecido por mim e pelos outros)</h2>
+        <div><strong>Positivos:</strong> <span id="desconhecido-pos"></span></div>
+        <div><strong>Negativos:</strong> <span id="desconhecido-neg"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function getIdFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id');
+    }
+
+    async function fetchResult(id) {
+      try {
+        const res = await fetch(`/api/result/${id}`);
+        if (!res.ok) throw new Error('ID inválido');
+        const data = await res.json();
+
+        document.getElementById('name').textContent = data.name;
+
+        const { aberto, cego, oculto, desconhecido } = data.quadrantes;
+
+        function renderTags(containerId, list) {
+          const container = document.getElementById(containerId);
+          container.innerHTML = '';
+          list.forEach(word => {
+            const span = document.createElement('span');
+            span.className = 'tag';
+            span.textContent = word;
+            container.appendChild(span);
+          });
+        }
+
+        renderTags('aberto-pos', aberto.positivos);
+        renderTags('aberto-neg', aberto.negativos);
+        renderTags('cego-pos', cego.positivos);
+        renderTags('cego-neg', cego.negativos);
+        renderTags('oculto-pos', oculto.positivos);
+        renderTags('oculto-neg', oculto.negativos);
+        renderTags('desconhecido-pos', desconhecido.positivos);
+        renderTags('desconhecido-neg', desconhecido.negativos);
+
+      } catch (err) {
+        document.body.innerHTML = '<p style="padding:2rem; font-size:1.2rem; color:red;">ID inválido ou resultado não encontrado.</p>';
+      }
+    }
+
+    fetchResult(getIdFromUrl());
+  </script>
+</body>
+</html>
