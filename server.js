@@ -67,7 +67,7 @@ app.get('/api/result/:id', (req, res) => {
   ];
 
   const NEGATIVOS = [
-    "Ansioso(a)", "Arrogante", "Autoritário(a)", "Cético(a)", "Desconfiado(a)",
+    "Bundao(ona)", "Arrogante", "Autoritário(a)", "Cético(a)", "Desconfiado(a)",
     "Desorganizado(a)", "Distraído(a)", "Egocêntrico(a)", "Emotivo(a)", "Explosivo(a)",
     "Impaciente", "Impulsivo(a)", "Indeciso(a)", "Inseguro(a)", "Introvertido(a)",
     "Irritável", "Irresponsável", "Mentiroso(a)", "Imaturo(a)", "Mau humorado",
