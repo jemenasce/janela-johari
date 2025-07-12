@@ -14,5 +14,21 @@
       ]
     },
     "friends": []
+  },
+  "745d84602f9a5885": {
+    "name": "Jessica",
+    "self": {
+      "positives": [
+        "Comunicativa",
+        "Empático(a)",
+        "Honesto(a)"
+      ],
+      "negatives": [
+        "Autoritário(a)",
+        "Egocêntrico(a)",
+        "Indeciso(a)"
+      ]
+    },
+    "friends": []
   }
 }

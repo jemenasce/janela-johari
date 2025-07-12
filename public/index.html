@@ -164,7 +164,7 @@
         const data = await res.json();
 
         if (data.success) {
-          const link = `${window.location.origin}/resultado.html?id=${data.id}`;
+          const link = `${window.location.origin}/amigo.html?id=${data.id}`;
           const resultDiv = document.getElementById("link-result");
           resultDiv.innerHTML = `<strong>Seu link:</strong><br><a href="${link}" target="_blank">${link}</a>`;
           resultDiv.classList.remove("hidden");
